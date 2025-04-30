@@ -26,11 +26,10 @@ def get_test_logger(file_path):
 def change_cwd(tmp_path, monkeypatch):
     """
     Run each test in an isolated tmp_path workspace,
-    so  process_logs.LOG_FILE points there.
+    so  process_logs.LOG_FILE and REPORT file point there.
     """
     monkeypatch.chdir(tmp_path)
     yield
-
 
 def test_warning_above_threshold(tmp_path, caplog):
     # Duration 6 minutes (greater than WARNING_THRESHOLD=5)
@@ -41,7 +40,7 @@ def test_warning_above_threshold(tmp_path, caplog):
     log_file = write_log_file(tmp_path, lines)
 
     caplog.set_level(logging.WARNING)
-    process_logs.process_logs(log_file, log=get_test_logger("log_file"))
+    process_logs.process_logs(log_file, log=get_test_logger("report_file"))
 
     # Expect a WARNING message about 6.00 minutes
     assert any(
@@ -60,7 +59,7 @@ def test_error_above_error_threshold(tmp_path, caplog):
     log_file = write_log_file(tmp_path, lines)
 
     caplog.set_level(logging.ERROR)
-    process_logs.process_logs(log_file, log=get_test_logger("log_file"))
+    process_logs.process_logs(log_file, log=get_test_logger("report_file"))
 
     # Expect an ERROR message about 11.00 minutes
     assert any(
@@ -78,7 +77,7 @@ def test_end_without_start(tmp_path, caplog):
     log_file = write_log_file(tmp_path, lines)
 
     caplog.set_level(logging.INFO)
-    process_logs.process_logs(log_file, log=get_test_logger("log_file"))
+    process_logs.process_logs(log_file, log=get_test_logger("report_file"))
 
     # Expect an INFO about END without matching START
     assert any(
@@ -96,7 +95,7 @@ def test_unknown_status(tmp_path, caplog):
     log_file = write_log_file(tmp_path, lines)
 
     caplog.set_level(logging.INFO)
-    process_logs.process_logs(log_file, log=get_test_logger("log_file"))
+    process_logs.process_logs(log_file, log=get_test_logger("report_file"))
 
     # Expect an INFO about unknown status
     assert any(
@@ -115,7 +114,7 @@ def test_invalid_timestamp_warning(tmp_path, caplog):
     log_file = write_log_file(tmp_path, lines)
 
     caplog.set_level(logging.WARNING)
-    process_logs.process_logs(log_file, log=get_test_logger("log_file"))
+    process_logs.process_logs(log_file, log=get_test_logger("report_file"))
 
     # Expect a WARNING about invalid timestamp
     assert any(
